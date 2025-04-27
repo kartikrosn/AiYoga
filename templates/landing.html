@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zen AI Yoga Companion</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .video-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            overflow: hidden;
+        }
+        .video-container video {
+            min-width: 100%;
+            min-height: 100%;
+            object-fit: cover;
+        }
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+        }
+        .content {
+            position: relative;
+            z-index: 1;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding-bottom: 2rem;
+        }
+        .auth-form {
+            transition: all 0.3s ease;
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+        }
+        .auth-form.active {
+            max-height: 500px;
+            opacity: 1;
+        }
+        .tab-button.active {
+            color: #fbbf24;
+            border-bottom-color: #fbbf24;
+        }
+        .tab-button.inactive {
+            color: #9ca3af;
+            border-bottom-color: transparent;
+        }
+    </style>
+</head>
+<body class="overflow-hidden">
+
+    <!-- Navbar -->
+<!-- Navbar -->
+<nav class="fixed top-0 left-0 w-full flex items-center justify-between px-6 py-4 z-10 bg-gray-900 bg-opacity-30 backdrop-blur-md">
+    <!-- Left: Logo -->
+    <div class="flex items-center">
+        <img src="https://upload.wikimedia.org/wikipedia/en/3/3a/Lovely_Professional_University_logo.png" 
+             alt="LPU Logo" 
+             class="h-12 w-auto mr-4">
+    </div>
+
+    <!-- Right: Names and Roll Numbers -->
+    <div class="text-white text-right">
+        <div class="text-lg font-semibold">Kartik Raushan - 12309602</div>
+        <div class="text-lg font-semibold">Anish Kumar - 12303427</div>
+    </div>
+</nav>
+
+
+    <!-- Video Background -->
+    <div class="video-container">
+        <video autoplay muted loop playsinline>
+            <source src="/static/luffy-moonlight-meditation.3840x2160.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+        <div class="overlay"></div>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+        <div class="max-w-md w-full mx-auto text-center bg-gray-900 bg-opacity-10 rounded-xl p-8 backdrop-blur-sm">
+            <h1 class="text-5xl font-bold mb-6 text-yellow-300">Zen AI Yoga</h1>
+            <p class="text-xl mb-8 text-yellow-100">Find your balance with AI guidance</p>
+            
+            <!-- Skip Button -->
+            <button id="guestButton" class="w-full mb-6 bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-lg transition duration-300">
+                Continue as Guest
+            </button>
+            
+            <!-- Auth Toggle Buttons -->
+            <div class="flex mb-2 border-b border-gray-700">
+                <button id="loginTab" class="flex-1 py-2 font-medium tab-button active">
+                    Login
+                </button>
+                <button id="signupTab" class="flex-1 py-2 font-medium tab-button inactive">
+                    Sign Up
+                </button>
+            </div>
+            
+            <!-- Login Form -->
+            <form id="loginForm" class="auth-form active mb-4">
+                <div class="mb-4">
+                    <input type="text" id="loginUsername" name="username" placeholder="Username" required 
+                           class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-yellow-500">
+                </div>
+                <div class="mb-6">
+                    <input type="password" id="loginPassword" name="password" placeholder="Password" required 
+                           class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-yellow-500">
+                </div>
+                <div id="loginError" class="text-red-500 text-sm mb-4 hidden"></div>
+                <button type="submit" 
+                        class="w-full bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300">
+                    Login
+                </button>
+            </form>
+            
+            <!-- Signup Form -->
+            <form id="signupForm" class="auth-form mb-4">
+                <div class="mb-4">
+                    <input type="text" id="signupUsername" name="username" placeholder="Username" required 
+                           class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-yellow-500">
+                </div>
+                <div class="mb-6">
+                    <input type="password" id="signupPassword" name="password" placeholder="Password" required 
+                           class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-yellow-500">
+                </div>
+                <div id="signupError" class="text-red-500 text-sm mb-4 hidden"></div>
+                <button type="submit" 
+                        class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300">
+                    Create Account
+                </button>
+            </form>
+            
+            <div class="text-sm text-gray-400">
+                By continuing, you agree to our Terms of Service
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM Elements
+        const loginTab = document.getElementById('loginTab');
+        const signupTab = document.getElementById('signupTab');
+        const loginForm = document.getElementById('loginForm');
+        const signupForm = document.getElementById('signupForm');
+        const guestButton = document.getElementById('guestButton');
+
+        // Toggle between login and signup forms
+        loginTab.addEventListener('click', () => {
+            loginTab.classList.remove('inactive');
+            loginTab.classList.add('active');
+            signupTab.classList.remove('active');
+            signupTab.classList.add('inactive');
+            loginForm.classList.add('active');
+            signupForm.classList.remove('active');
+        });
+
+        signupTab.addEventListener('click', () => {
+            signupTab.classList.remove('inactive');
+            signupTab.classList.add('active');
+            loginTab.classList.remove('active');
+            loginTab.classList.add('inactive');
+            signupForm.classList.add('active');
+            loginForm.classList.remove('active');
+        });
+
+        // Guest login functionality
+        guestButton.addEventListener('click', async () => {
+            guestButton.disabled = true;
+            guestButton.innerHTML = 'Loading...';
+            
+            try {
+                const response = await fetch('/skip-login', {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+
+                if (response.ok) {
+                    window.location.href = '/app';
+                } else {
+                    console.error('Error:', response.status);
+                    window.location.href = '/app';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                window.location.href = '/app';
+            } finally {
+                guestButton.disabled = false;
+                guestButton.innerHTML = 'Continue as Guest';
+            }
+        });
+
+        // Handle form submissions
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+
+            fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username, password })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.redirect) {
+                    window.location.href = data.redirect;
+                } else if (data.error) {
+                    alert(data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred during login. Please try again.');
+            });
+        });
+
+        document.getElementById('signupForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('signupUsername').value;
+            const password = document.getElementById('signupPassword').value;
+
+            fetch('/signup', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username, password })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.redirect) {
+                    window.location.href = data.redirect;
+                } else if (data.error) {
+                    alert(data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred during signup. Please try again.');
+            });
+        });
+    </script>
+</body>
+</html>
